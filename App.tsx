@@ -128,19 +128,39 @@ const App: React.FC = () => {
 
       <div className="max-w-7xl mx-auto">
         <header className="mb-12 bg-white rounded-xl shadow-md p-8">
-          <div className="flex items-center justify-center gap-6 mb-4">
-            <img
-              src="/botao.png"
-              alt="Logo"
-              className="h-16 w-16 md:h-20 md:w-20 object-contain"
-            />
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent pb-2">
-                Simulador de Decisões Invertidas
-              </h1>
-              <p className="text-lg md:text-xl font-semibold text-gray-700 mt-1">
-                Projeto Centauro
-              </p>
+          <div className="flex flex-col gap-6 mb-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-center lg:gap-6 flex-1">
+              <img
+                src="/botao.png"
+                alt="Logo"
+                className="h-16 w-16 md:h-20 md:w-20 object-contain"
+              />
+              <div className="text-center w-full">
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent pb-2">
+                  Simulador de Decisões Invertidas
+                </h1>
+                <p className="text-lg md:text-xl font-semibold text-gray-700 mt-1">
+                  Projeto Centauro
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center lg:justify-end lg:w-auto">
+              <a
+                href="https://github.com/Pavolker/ebook-decisao/releases/download/IA/DECISAO.INVERTIDA.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group text-center"
+                title="Baixar Ebook Decisão Invertida"
+              >
+                <img
+                  src="/capa.png"
+                  alt="Capa do ebook Decisão Invertida"
+                  className="w-28 md:w-32 lg:w-36 rounded-lg shadow-md border border-gray-200 group-hover:shadow-lg transition-shadow"
+                />
+                <span className="block mt-2 text-sm font-semibold text-blue-700 group-hover:text-blue-900">
+                  Baixar Ebook
+                </span>
+              </a>
             </div>
           </div>
           <p className="mt-3 text-lg text-gray-600 max-w-3xl mx-auto text-center">
