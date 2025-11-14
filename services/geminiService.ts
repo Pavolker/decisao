@@ -15,10 +15,12 @@ import type { SimulationResult } from '../types';
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  throw new Error("VITE_GEMINI_API_KEY environment variable is not set. Please add it to your .env.local file.");
+  throw new Error("VITE_GEMINI_API_KEY não configurada. Em desenvolvimento, defina em .env.local; em produção, configure nas variáveis de ambiente do provedor (Netlify).");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
+const modelsOrder = ['gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash'];
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const schema = {
   type: Type.OBJECT,
@@ -119,51 +121,46 @@ const schema = {
 
 
 export const runSimulation = async (decisionText: string): Promise<SimulationResult> => {
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Você é um consultor de estratégia de negócios sênior. Analise a seguinte decisão empresarial, formule sua versão invertida e gere uma análise comparativa completa. A decisão é: "${decisionText}"`,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: schema,
-        temperature: 0.5,
+  const tryGenerate = async (): Promise<string> => {
+    for (const model of modelsOrder) {
+      let attempt = 0;
+      while (attempt < 3) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents: `Você é um consultor de estratégia de negócios sênior. Analise a seguinte decisão empresarial, formule sua versão invertida e gere uma análise comparativa completa. A decisão é: "${decisionText}"`,
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: schema,
+              temperature: 0.5,
+            }
+          });
+          const txt = response.text.trim();
+          if (!txt) throw new Error('Resposta vazia');
+          return txt;
+        } catch (err: any) {
+          const msg = typeof err?.message === 'string' ? err.message : '';
+          const code = err?.error?.code;
+          const overloaded = msg.toLowerCase().includes('overloaded') || code === 503 || msg.includes('UNAVAILABLE');
+          if (overloaded) {
+            await sleep(500 * Math.pow(2, attempt));
+            attempt += 1;
+            if (attempt >= 3) break;
+            continue;
+          }
+          if (msg.includes('API key')) throw new Error('Chave de API inválida ou não configurada. Verifique o arquivo .env.local');
+          if (msg.includes('quota')) throw new Error('Limite de quota da API atingido. Tente novamente mais tarde.');
+          if (msg.includes('rate limit')) throw new Error('Muitas requisições. Aguarde alguns segundos e tente novamente.');
+          if (msg.includes('network') || msg.includes('fetch')) throw new Error('Erro de conexão. Verifique sua internet e tente novamente.');
+          if (msg.includes('JSON')) throw new Error('Erro ao processar a resposta da API. Tente novamente.');
+          throw new Error(`Erro na simulação: ${msg || 'desconhecido'}`);
+        }
       }
-    });
-
-    const resultText = response.text.trim();
-
-    if (!resultText) {
-      throw new Error("A API retornou uma resposta vazia.");
     }
+    throw new Error('Modelo sobrecarregado. Tente novamente em alguns segundos.');
+  };
 
-    const resultJson = JSON.parse(resultText);
-
-    return resultJson as SimulationResult;
-  } catch (error) {
-    console.error("Error running simulation:", error);
-
-    // Tratamento de erros específicos
-    if (error instanceof Error) {
-      if (error.message.includes('API key')) {
-        throw new Error("Chave de API inválida ou não configurada. Verifique o arquivo .env.local");
-      }
-      if (error.message.includes('quota')) {
-        throw new Error("Limite de quota da API atingido. Tente novamente mais tarde.");
-      }
-      if (error.message.includes('rate limit')) {
-        throw new Error("Muitas requisições. Aguarde alguns segundos e tente novamente.");
-      }
-      if (error.message.includes('network') || error.message.includes('fetch')) {
-        throw new Error("Erro de conexão. Verifique sua internet e tente novamente.");
-      }
-      if (error.message.includes('JSON')) {
-        throw new Error("Erro ao processar a resposta da API. Tente novamente.");
-      }
-
-      // Se for um erro conhecido mas sem tratamento específico
-      throw new Error(`Erro na simulação: ${error.message}`);
-    }
-
-    throw new Error("Erro desconhecido ao gerar a simulação. Verifique o console para mais detalhes.");
-  }
+  const resultText = await tryGenerate();
+  const resultJson = JSON.parse(resultText);
+  return resultJson as SimulationResult;
 };
