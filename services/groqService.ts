@@ -3,17 +3,51 @@ import type { SimulationResult } from '../types';
 const API_URL = '/api/openai';
 const MAX_RETRIES = 2;
 
+function sanitizeJson(text: string): string {
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end <= start) {
+    throw new Error('Erro ao processar a resposta da API. Tente novamente.');
+  }
+  const slice = text.slice(start, end + 1);
+
+  let out = '';
+  let inString = false;
+  let escaped = false;
+
+  for (let i = 0; i < slice.length; i += 1) {
+    const ch = slice[i];
+    if (escaped) {
+      out += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\\\') {
+      out += ch;
+      escaped = true;
+      continue;
+    }
+    if (ch === '\"') {
+      inString = !inString;
+      out += ch;
+      continue;
+    }
+    if (inString && (ch === '\\n' || ch === '\\r')) {
+      out += '\\\\n';
+      continue;
+    }
+    out += ch;
+  }
+
+  return out;
+}
+
 function extractJson(text: string): SimulationResult {
   try {
     return JSON.parse(text) as SimulationResult;
   } catch {
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    if (start >= 0 && end > start) {
-      const slice = text.slice(start, end + 1);
-      return JSON.parse(slice) as SimulationResult;
-    }
-    throw new Error('Erro ao processar a resposta da API. Tente novamente.');
+    const cleaned = sanitizeJson(text);
+    return JSON.parse(cleaned) as SimulationResult;
   }
 }
 

@@ -5,6 +5,7 @@ const SYSTEM_PROMPT = `Você é um consultor de estratégia de negócios sênior
 Sua tarefa: analisar a decisão informada, formular sua versão invertida e gerar uma análise comparativa completa.
 
 Responda SOMENTE com JSON válido, sem markdown, sem texto extra.
+O JSON deve ser compacto (uma linha) e com quebras de linha dentro de strings escapadas como \\n.
 Siga exatamente este esquema e tipos:
 {
   "realDecision": { "summary": "string" },
@@ -37,7 +38,7 @@ Siga exatamente este esquema e tipos:
 
 Regras:
 - summaries: 100-150 palavras
-- strategicNarrative: 3 parágrafos, separados por \n\n
+- strategicNarrative: 3 parágrafos, separados por \\n\\n
 - radarMetrics: valores de 0 a 10 (números)
 - Não invente chaves extras.
 `;
