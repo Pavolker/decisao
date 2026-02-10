@@ -6,7 +6,7 @@ Este documento contém instruções para fazer deploy do **Simulador de Decisõe
 
 1. Conta no [Netlify](https://www.netlify.com/) (gratuita)
 2. Repositório Git (GitHub, GitLab ou Bitbucket) - opcional, mas recomendado
-3. Chave API do Google Gemini configurada
+3. Chave API da Groq configurada
 
 ## Opção 1: Deploy via Git (Recomendado)
 
@@ -39,9 +39,11 @@ git push -u origin main
 ### Passo 3: Configurar variáveis de ambiente
 
 1. No painel do Netlify, vá em **Site settings** > **Environment variables**
-2. Adicione a variável:
-   - **Key:** `VITE_GEMINI_API_KEY`
-   - **Value:** Sua chave API do Google Gemini
+2. Adicione as variáveis:
+   - **Key:** `GROQ_API_KEY`
+   - **Value:** Sua chave API da Groq
+   - **Key:** `GROQ_MODEL` (opcional)
+   - **Value:** `llama-3.1-8b-instant`
 
 ### Passo 4: Deploy
 
@@ -146,7 +148,7 @@ Execute `npm run build` novamente e faça upload da pasta `dist` atualizada.
 
 ### Build falhou
 - Verifique os logs no painel do Netlify
-- Certifique-se de que `VITE_GEMINI_API_KEY` está configurada
+- Certifique-se de que `GROQ_API_KEY` está configurada
 - Verifique se todas as dependências estão no `package.json`
 
 ### Site não carrega corretamente
@@ -155,20 +157,13 @@ Execute `npm run build` novamente e faça upload da pasta `dist` atualizada.
 - Limpe o cache do navegador
 
 ### API não funciona
-- Verifique se a variável `VITE_GEMINI_API_KEY` está configurada corretamente
-- Verifique se a chave API é válida no Google AI Studio
-- Verifique as cotas da API no Google Cloud Console
+- Verifique se a variável `GROQ_API_KEY` está configurada corretamente
+- Verifique se a chave API é válida no painel da Groq
+- Verifique as cotas/limites da Groq
 
 ## Segurança
 
-⚠️ **Importante sobre a chave API:**
-
-Este projeto expõe a chave API do Gemini no frontend. Para produção, considere:
-
-1. Implementar um backend/proxy para proteger a chave
-2. Usar restrições de domínio na API key do Google Cloud
-3. Implementar rate limiting
-4. Adicionar autenticação de usuários
+A chave da Groq é usada apenas no backend (Netlify Functions) e não fica exposta no navegador.
 
 ## Recursos Adicionais
 

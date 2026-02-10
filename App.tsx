@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { runSimulation } from './services/geminiService';
+import { runSimulation } from './services/groqService';
 import { historyService, type HistoryItem } from './services/historyService';
 import type { SimulationResult } from './types';
 import ResultsDisplay from './components/ResultsDisplay';

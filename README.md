@@ -2,48 +2,36 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Simulador de Decisões Invertidas (Groq LLaMA)
 
-This contains everything you need to run your app locally.
+Aplicação web para simular os efeitos de uma decisão empresarial e sua versão invertida, usando Groq (LLaMA) via Netlify Functions.
 
-View your app in AI Studio: https://ai.studio/apps/temp/1
+## Rodar localmente
 
-## Run Locally
+**Pré-requisito:** Node.js
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
+1. Instale dependências:
    ```bash
    npm install
    ```
 
-2. Configure your API key:
-   - Open [.env.local](.env.local)
-   - Replace `PLACEHOLDER_API_KEY` with your actual Gemini API key:
+2. Configure as variáveis de ambiente:
+   - Edite `.env.local`:
    ```
-   VITE_GEMINI_API_KEY=your_actual_api_key_here
+   GROQ_API_KEY=gsk-coloque_sua_chave_aqui
+   GROQ_MODEL=llama-3.1-8b-instant
    ```
-   - Get your API key at: https://aistudio.google.com/app/apikey
 
-3. Run the app:
+3. Rode usando Netlify Dev (para habilitar Functions):
    ```bash
-   npm run dev
+   npx netlify dev
    ```
 
-## ⚠️ Security Warning
+4. Abra a URL exibida no terminal.
 
-**This app exposes the Gemini API key in the browser (client-side).**
+## Segurança
 
-This is acceptable for:
-- Local development
-- Personal demos
-- Testing purposes
-
-**NOT recommended for production** without implementing:
-1. Backend proxy server to protect the API key
-2. User authentication and rate limiting
-3. Domain restrictions on your Google Cloud API key settings
+A chave da Groq fica no **backend (Netlify Functions)**. Ela **não** é exposta no navegador.
 
 ---
 
